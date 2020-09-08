@@ -36,10 +36,14 @@ sub_data_grp = sub_data_demo.groupby(by=['country', 'device'],
 sub_data_grp.agg({'price':['mean', 'min', 'max'],
 				  'age':['mean', 'min', 'max']})
 
-#custom function to agg by
-
+#Defining custom function to eliminate outliers 1st & last quantile 
+#used later to agg by
 def truncated_mean(data):
-	"""returns df without 1st and 9th decile - exclude outliers"""
+	"""returns df without 1st and 9th decile - exclude outliers
+	Input : dataframe
+	Output : truncated mean
+	"""
+
 	top_val = data.quantile(.9)
 	min_val = data.quantile(.1)
 	truncated_data = data[(data <= top_val) & (data >= min_val)]
@@ -50,12 +54,13 @@ def truncated_mean(data):
 sub_data_grp.agg({'age':[(truncated_mean)]})
 
 ##KPIs Cohort analysis over App usage
+#defining current_date variable
 current_date = pd.to_datetime(get_date)
 
 #Lapse Date = end of 7 day free trial
 sub_data_demo.lapse_data.max()
 
-#defining KPIs
+#defining max_purchase_date
 max_purchase_date = current_date - timedelta(days = 7)
 
 #filtering dataset with last 7 day free trial period
